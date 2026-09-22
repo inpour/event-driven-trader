@@ -1,0 +1,100 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/inpour/event-driven-trader/api/events/candle-closed.json",
+  "title": "CandleClosed",
+  "description": "Published by market-data-service when one OHLCV candle is closed.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "event_id",
+    "event_type",
+    "event_version",
+    "occurred_at",
+    "producer",
+    "run_id",
+    "payload"
+  ],
+  "properties": {
+    "event_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "event_type": {
+      "const": "market.candle.closed"
+    },
+    "event_version": {
+      "const": 1
+    },
+    "occurred_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "producer": {
+      "const": "market-data-service"
+    },
+    "run_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "payload": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "symbol",
+        "timeframe",
+        "candle"
+      ],
+      "properties": {
+        "symbol": {
+          "type": "string",
+          "minLength": 1,
+          "examples": ["BTCUSDT"]
+        },
+        "timeframe": {
+          "type": "string",
+          "minLength": 1,
+          "examples": ["5m"]
+        },
+        "candle": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "open_time",
+            "close_time",
+            "open",
+            "high",
+            "low",
+            "close",
+            "volume"
+          ],
+          "properties": {
+            "open_time": {
+              "type": "string",
+              "format": "date-time"
+            },
+            "close_time": {
+              "type": "string",
+              "format": "date-time"
+            },
+            "open": {
+              "type": "number"
+            },
+            "high": {
+              "type": "number"
+            },
+            "low": {
+              "type": "number"
+            },
+            "close": {
+              "type": "number"
+            },
+            "volume": {
+              "type": "number",
+              "minimum": 0
+            }
+          }
+        }
+      }
+    }
+  }
+}
