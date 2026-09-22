@@ -1,0 +1,15 @@
+kafka:
+  broker: kafka:9092
+
+input:
+  csv_path: /app/data/input/data.csv
+
+market:
+  symbol: US30
+  timeframe: 5m
+
+run:
+  id: local-run-001
+
+replay:
+  mode: fast
