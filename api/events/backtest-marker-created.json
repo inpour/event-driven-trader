@@ -1,0 +1,95 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/inpour/event-driven-trader/api/events/backtest-marker-created.json",
+  "title": "BacktestMarkerCreated",
+  "description": "Published by backtest-service when a strategy creates a marker for chart rendering.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "event_id",
+    "event_type",
+    "event_version",
+    "occurred_at",
+    "producer",
+    "run_id",
+    "payload"
+  ],
+  "properties": {
+    "event_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "event_type": {
+      "const": "backtest.marker.created"
+    },
+    "event_version": {
+      "const": 1
+    },
+    "occurred_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "producer": {
+      "const": "backtest-service"
+    },
+    "run_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "payload": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "marker_id",
+        "strategy",
+        "strategy_version",
+        "type",
+        "occurred_at",
+        "price"
+      ],
+      "properties": {
+        "marker_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "strategy": {
+          "type": "string",
+          "minLength": 1,
+          "examples": ["sp2l"]
+        },
+        "strategy_version": {
+          "type": "string",
+          "minLength": 1,
+          "examples": ["v3"]
+        },
+        "type": {
+          "type": "string",
+          "enum": [
+            "entry",
+            "exit",
+            "stop_loss",
+            "take_profit"
+          ]
+        },
+        "side": {
+          "type": "string",
+          "enum": [
+            "long",
+            "short"
+          ]
+        },
+        "occurred_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "price": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "reason": {
+          "type": "string"
+        }
+      }
+    }
+  }
+}

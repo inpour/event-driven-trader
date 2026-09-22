@@ -1,0 +1,88 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/inpour/event-driven-trader/api/events/backtest-run-completed.json",
+  "title": "BacktestRunCompleted",
+  "description": "Published by backtest-service after it has processed all candles and emitted all markers.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "event_id",
+    "event_type",
+    "event_version",
+    "occurred_at",
+    "producer",
+    "run_id",
+    "payload"
+  ],
+  "properties": {
+    "event_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "event_type": {
+      "const": "backtest.run.completed"
+    },
+    "event_version": {
+      "const": 1
+    },
+    "occurred_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "producer": {
+      "const": "backtest-service"
+    },
+    "run_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "payload": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "candle_count",
+        "marker_count",
+        "strategy",
+        "strategy_version",
+        "symbol",
+        "timeframe",
+        "started_at",
+        "completed_at"
+      ],
+      "properties": {
+        "candle_count": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "marker_count": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "strategy": {
+          "type": "string",
+          "minLength": 1
+        },
+        "strategy_version": {
+          "type": "string",
+          "minLength": 1
+        },
+        "symbol": {
+          "type": "string",
+          "minLength": 1
+        },
+        "timeframe": {
+          "type": "string",
+          "minLength": 1
+        },
+        "started_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "completed_at": {
+          "type": "string",
+          "format": "date-time"
+        }
+      }
+    }
+  }
+}
