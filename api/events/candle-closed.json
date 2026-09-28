@@ -1,6 +1,4 @@
 {
-  "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://github.com/inpour/event-driven-trader/api/events/candle-closed.json",
   "title": "CandleClosed",
   "description": "Published by market-data-service when one OHLCV candle is closed.",
   "type": "object",
@@ -48,12 +46,16 @@
         "symbol": {
           "type": "string",
           "minLength": 1,
-          "examples": ["BTCUSDT"]
+          "examples": [
+            "BTCUSDT"
+          ]
         },
         "timeframe": {
           "type": "string",
           "minLength": 1,
-          "examples": ["5m"]
+          "examples": [
+            "5m"
+          ]
         },
         "candle": {
           "type": "object",

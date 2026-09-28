@@ -1,6 +1,4 @@
 {
-  "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://github.com/inpour/event-driven-trader/api/events/backtest-marker-created.json",
   "title": "BacktestMarkerCreated",
   "description": "Published by backtest-service when a strategy creates a marker for chart rendering.",
   "type": "object",
@@ -55,12 +53,16 @@
         "strategy": {
           "type": "string",
           "minLength": 1,
-          "examples": ["sp2l"]
+          "examples": [
+            "sp2l"
+          ]
         },
         "strategy_version": {
           "type": "string",
           "minLength": 1,
-          "examples": ["v3"]
+          "examples": [
+            "v3"
+          ]
         },
         "type": {
           "type": "string",

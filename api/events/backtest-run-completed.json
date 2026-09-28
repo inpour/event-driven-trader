@@ -1,6 +1,4 @@
 {
-  "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://github.com/inpour/event-driven-trader/api/events/backtest-run-completed.json",
   "title": "BacktestRunCompleted",
   "description": "Published by backtest-service after it has processed all candles and emitted all markers.",
   "type": "object",
