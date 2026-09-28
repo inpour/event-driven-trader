@@ -6,8 +6,8 @@ KAFKA_BIN := /opt/kafka/bin
 TOPIC_CANDLE_CLOSED := market.candle.closed
 TOPIC_INPUT_COMPLETED := backtest.input.completed
 
-ORDER_EXECUTION_SERVICE := order-execution-service
 MARKET_DATA_SERVICE := market-data-service
+ORDER_EXECUTION_SERVICE := order-execution-service
 
 .PHONY: \
 	rebuild \
@@ -77,23 +77,23 @@ logs-topic-init:
 	$(COMPOSE) logs topic-init
 
 build-market-data:
-	$(COMPOSE) build market-data-service
+	$(COMPOSE) build $(MARKET_DATA_SERVICE)
 
 logs-market-data:
-	$(COMPOSE) logs market-data-service
+	$(COMPOSE) logs $(MARKET_DATA_SERVICE)
 
 run-market-data:
-	$(COMPOSE) rm -f market-data-service
-	$(COMPOSE) up market-data-service
+	$(COMPOSE) rm -f $(MARKET_DATA_SERVICE)
+	$(COMPOSE) up $(MARKET_DATA_SERVICE)
 
 build-order-execution:
-	$(COMPOSE) build order-execution-service
+	$(COMPOSE) build $(ORDER_EXECUTION_SERVICE)
 
 logs-order-execution:
-	$(COMPOSE) logs -f order-execution-service
+	$(COMPOSE) logs -f $(ORDER_EXECUTION_SERVICE)
 
 run-order-execution:
-	$(COMPOSE) up -d order-execution-service
+	$(COMPOSE) up -d $(ORDER_EXECUTION_SERVICE)
 
 kafka-topics:
 	$(COMPOSE) exec $(KAFKA_SERVICE) \
