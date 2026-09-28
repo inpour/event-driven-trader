@@ -1,0 +1,6 @@
+kafka:
+  broker: kafka:9092
+  group_id: order-execution-service
+
+consumer:
+  start_offset: latest # ignores old candle-closed events
