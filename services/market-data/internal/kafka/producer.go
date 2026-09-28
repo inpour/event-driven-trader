@@ -28,7 +28,6 @@ type Producer struct {
 	inputCompletedWriter *kafkago.Writer
 }
 
-// NewProducer creates a Kafka producer for market-data events.
 func NewProducer(broker string) *Producer {
 	return &Producer{
 		candleWriter:         newWriter(broker, TopicCandleClosed),
