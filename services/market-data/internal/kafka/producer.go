@@ -42,6 +42,8 @@ func newWriter(broker string, topic string) *kafkago.Writer {
 		Balancer:     &kafkago.Hash{},
 		RequiredAcks: kafkago.RequireAll,
 		Async:        false,
+		BatchSize:    1,
+		BatchTimeout: 0,
 	}
 }
 
