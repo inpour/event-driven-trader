@@ -8,7 +8,6 @@ import (
 	"gopkg.in/yaml.v3"
 )
 
-// Config contains all runtime configuration for market-data-service.
 type Config struct {
 	Kafka  KafkaConfig  `yaml:"kafka"`
 	Input  InputConfig  `yaml:"input"`
@@ -61,7 +60,6 @@ func Load(path string) (Config, error) {
 	return cfg, nil
 }
 
-// Validate ensures all required configuration fields have usable values.
 func (c Config) Validate() error {
 	if strings.TrimSpace(c.Kafka.Broker) == "" {
 		return fmt.Errorf("kafka.broker is required")
