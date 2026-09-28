@@ -82,3 +82,20 @@ services:
         condition: service_healthy
       topic-init:
         condition: service_completed_successfully
+      order-execution-service:
+        condition: service_started
+
+  order-execution-service:
+    build:
+      context: ..
+      dockerfile: services/order-execution/Dockerfile
+    container_name: event-driven-trader-order-execution
+    environment:
+      CONFIG_PATH: /app/config/config.yaml
+    volumes:
+      - ../services/order-execution/configs/config.yaml:/app/config/config.yaml:ro
+    depends_on:
+      kafka:
+        condition: service_healthy
+      topic-init:
+        condition: service_completed_successfully
