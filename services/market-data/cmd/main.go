@@ -11,7 +11,7 @@ import (
 	csvfeed "github.com/inpour/event-driven-trader/services/market-data/internal/provider/csv"
 )
 
-const defaultConfigPath = "/app/config/config.yaml"
+const defaultConfigPath = "/app/configs/config.yaml"
 
 func main() {
 	if err := run(); err != nil {

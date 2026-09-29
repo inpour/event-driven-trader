@@ -53,12 +53,28 @@ services:
           --topic market.candle.closed \
           --partitions 1 \
           --replication-factor 1
-        
+
         /opt/kafka/bin/kafka-topics.sh \
           --bootstrap-server kafka:9092 \
           --create \
           --if-not-exists \
           --topic backtest.input.completed \
+          --partitions 1 \
+          --replication-factor 1
+
+        /opt/kafka/bin/kafka-topics.sh \
+          --bootstrap-server kafka:9092 \
+          --create \
+          --if-not-exists \
+          --topic backtest.marker.created \
+          --partitions 1 \
+          --replication-factor 1
+
+        /opt/kafka/bin/kafka-topics.sh \
+          --bootstrap-server kafka:9092 \
+          --create \
+          --if-not-exists \
+          --topic backtest.run.completed \
           --partitions 1 \
           --replication-factor 1
         
@@ -73,9 +89,9 @@ services:
       dockerfile: services/market-data/Dockerfile
     container_name: event-driven-trader-market-data
     environment:
-      CONFIG_PATH: /app/config/config.yaml
+      CONFIG_PATH: /app/configs/config.yaml
     volumes:
-      - ../services/market-data/configs/config.yaml:/app/config/config.yaml:ro
+      - ../services/market-data/configs/config.yaml:/app/configs/config.yaml:ro
       - ../data/input:/app/data/input:ro
     depends_on:
       kafka:
@@ -91,11 +107,27 @@ services:
       dockerfile: services/order-execution/Dockerfile
     container_name: event-driven-trader-order-execution
     environment:
-      CONFIG_PATH: /app/config/config.yaml
+      CONFIG_PATH: /app/configs/config.yaml
     volumes:
-      - ../services/order-execution/configs/config.yaml:/app/config/config.yaml:ro
+      - ../services/order-execution/configs/config.yaml:/app/configs/config.yaml:ro
     depends_on:
       kafka:
         condition: service_healthy
       topic-init:
         condition: service_completed_successfully
+
+  backtest-service:
+    build:
+      context: ..
+      dockerfile: services/backtest/Dockerfile
+    container_name: event-driven-trader-backtest-service
+    environment:
+      CONFIG_PATH: /app/configs/config.yaml
+    volumes:
+      - ../services/backtest/configs/config.yaml:/app/configs/config.yaml:ro
+    depends_on:
+      kafka:
+        condition: service_healthy
+      topic-init:
+        condition: service_completed_successfully
+    restart: unless-stopped

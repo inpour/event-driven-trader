@@ -13,7 +13,7 @@ import (
 	"github.com/inpour/event-driven-trader/services/order-execution/internal/kafka"
 )
 
-const defaultConfigPath = "/app/config/config.yaml"
+const defaultConfigPath = "/app/configs/config.yaml"
 
 func main() {
 	if err := run(); err != nil {
