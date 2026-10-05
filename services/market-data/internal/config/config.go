@@ -13,7 +13,6 @@ type Config struct {
 	Input  InputConfig  `yaml:"input"`
 	Market MarketConfig `yaml:"market"`
 	Run    RunConfig    `yaml:"run"`
-	Replay ReplayConfig `yaml:"replay"`
 }
 
 type KafkaConfig struct {
@@ -31,10 +30,6 @@ type MarketConfig struct {
 
 type RunConfig struct {
 	ID string `yaml:"id"`
-}
-
-type ReplayConfig struct {
-	Mode string `yaml:"mode"`
 }
 
 // Load reads YAML configuration from path and applies supported environment
@@ -81,16 +76,7 @@ func (c Config) Validate() error {
 		return fmt.Errorf("run.id is required")
 	}
 
-	switch c.Replay.Mode {
-	case "fast":
-		return nil
-	default:
-		return fmt.Errorf(
-			"replay.mode must be %q, got %q",
-			"fast",
-			c.Replay.Mode,
-		)
-	}
+	return nil
 }
 
 func applyEnvironmentOverrides(cfg *Config) {
@@ -112,9 +98,5 @@ func applyEnvironmentOverrides(cfg *Config) {
 
 	if value := os.Getenv("RUN_ID"); value != "" {
 		cfg.Run.ID = value
-	}
-
-	if value := os.Getenv("REPLAY_MODE"); value != "" {
-		cfg.Replay.Mode = value
 	}
 }

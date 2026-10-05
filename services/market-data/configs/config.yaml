@@ -10,6 +10,3 @@ market:
 
 run:
   id: local-run-001
-
-replay:
-  mode: fast
