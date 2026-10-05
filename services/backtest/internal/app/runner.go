@@ -19,17 +19,28 @@ func NewRunner(strategy strategy.Strategy) *Runner {
 	}
 }
 
-func (r *Runner) Run(ctx context.Context, candles []*market.Candle) ([]*backtest.Marker, error) {
+func (r *Runner) Run(ctx context.Context, candles []*market.Candle) ([]*backtest.Marker, *backtest.Metrics, error) {
 	markers, err := r.strategy.Probe(ctx, candles)
 	if err != nil {
 		info := r.strategy.Info()
-		return nil, fmt.Errorf(
-			"run strategy %s@%s: %w",
+		return nil, nil, fmt.Errorf(
+			"run strategy (probe) %s@%s: %w",
 			info.Name,
 			info.Version,
 			err,
 		)
 	}
 
-	return markers, nil
+	metrics, err := r.strategy.Metrics()
+	if err != nil {
+		info := r.strategy.Info()
+		return nil, nil, fmt.Errorf(
+			"run strategy (get metrics) %s@%s: %w",
+			info.Name,
+			info.Version,
+			err,
+		)
+	}
+
+	return markers, metrics, nil
 }

@@ -51,7 +51,7 @@ func run() error {
 	inputConsumer := kafka.NewInputCompletedConsumer(
 		cfg.Kafka.Broker,
 		cfg.Kafka.Consumer.GroupID,
-		cfg.Kafka.Consumer.InputCompletedTopic,
+		kafka.TopicInputCompleted,
 	)
 	defer func() {
 		if err := inputConsumer.Close(); err != nil {
@@ -64,13 +64,13 @@ func run() error {
 
 	batchReader := kafka.NewBatchReader(
 		cfg.Kafka.Broker,
-		cfg.Kafka.Consumer.CandleTopic,
+		kafka.TopicCandleClosed,
 	)
 
 	producer, err := kafka.NewProducer(
 		cfg.Kafka.Broker,
-		cfg.Kafka.Producer.MarkerCreatedTopic,
-		cfg.Kafka.Producer.RunCompletedTopic,
+		kafka.TopicMarkerCreated,
+		kafka.TopicRunCompleted,
 	)
 	if err != nil {
 		return fmt.Errorf("create Kafka producer: %w", err)
@@ -98,14 +98,6 @@ func run() error {
 		"backtest service started",
 		"service", cfg.Service.Name,
 		"group_id", cfg.Kafka.Consumer.GroupID,
-		"input_completed_topic",
-		cfg.Kafka.Consumer.InputCompletedTopic,
-		"candle_topic",
-		cfg.Kafka.Consumer.CandleTopic,
-		"marker_created_topic",
-		cfg.Kafka.Producer.MarkerCreatedTopic,
-		"run_completed_topic",
-		cfg.Kafka.Producer.RunCompletedTopic,
 	)
 
 	return consumeInputCompletedEvents(

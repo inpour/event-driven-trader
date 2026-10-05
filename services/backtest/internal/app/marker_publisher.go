@@ -77,6 +77,7 @@ func (p *MarkerPublisher) PublishRunCompleted(
 	strategyVersion string,
 	markerCount int,
 	startedAt time.Time,
+	metrics *backtest.Metrics,
 ) error {
 	completedAt := time.Now().UTC()
 
@@ -94,7 +95,7 @@ func (p *MarkerPublisher) PublishRunCompleted(
 			Symbol:          input.Payload.Symbol,
 			Timeframe:       input.Payload.Timeframe,
 			StartedAt:       startedAt,
-			CompletedAt:     completedAt,
+			Metrics:         *metrics,
 		},
 	}
 

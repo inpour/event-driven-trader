@@ -22,18 +22,10 @@ type ServiceConfig struct {
 type KafkaConfig struct {
 	Broker   string              `yaml:"broker"`
 	Consumer KafkaConsumerConfig `yaml:"consumer"`
-	Producer KafkaProducerConfig `yaml:"producer"`
 }
 
 type KafkaConsumerConfig struct {
-	GroupID             string `yaml:"group_id"`
-	InputCompletedTopic string `yaml:"input_completed_topic"`
-	CandleTopic         string `yaml:"candle_topic"`
-}
-
-type KafkaProducerConfig struct {
-	MarkerCreatedTopic string `yaml:"marker_created_topic"`
-	RunCompletedTopic  string `yaml:"run_completed_topic"`
+	GroupID string `yaml:"group_id"`
 }
 
 // Load reads YAML configuration from path and applies supported environment
@@ -90,40 +82,6 @@ func (c Config) Validate() error {
 		)
 	}
 
-	if strings.TrimSpace(c.Kafka.Consumer.InputCompletedTopic) == "" {
-		result = errors.Join(
-			result,
-			errors.New(
-				"kafka.consumer.input_completed_topic is required",
-			),
-		)
-	}
-
-	if strings.TrimSpace(c.Kafka.Consumer.CandleTopic) == "" {
-		result = errors.Join(
-			result,
-			errors.New("kafka.consumer.candle_topic is required"),
-		)
-	}
-
-	if strings.TrimSpace(c.Kafka.Producer.MarkerCreatedTopic) == "" {
-		result = errors.Join(
-			result,
-			errors.New(
-				"kafka.producer.marker_created_topic is required",
-			),
-		)
-	}
-
-	if strings.TrimSpace(c.Kafka.Producer.RunCompletedTopic) == "" {
-		result = errors.Join(
-			result,
-			errors.New(
-				"kafka.producer.run_completed_topic is required",
-			),
-		)
-	}
-
 	return result
 }
 
@@ -142,21 +100,5 @@ func applyEnvironmentOverrides(cfg *Config) {
 
 	if value := strings.TrimSpace(os.Getenv("KAFKA_GROUP_ID")); value != "" {
 		cfg.Kafka.Consumer.GroupID = value
-	}
-
-	if value := strings.TrimSpace(os.Getenv("KAFKA_INPUT_COMPLETED_TOPIC")); value != "" {
-		cfg.Kafka.Consumer.InputCompletedTopic = value
-	}
-
-	if value := strings.TrimSpace(os.Getenv("KAFKA_CANDLE_TOPIC")); value != "" {
-		cfg.Kafka.Consumer.CandleTopic = value
-	}
-
-	if value := strings.TrimSpace(os.Getenv("KAFKA_MARKER_CREATED_TOPIC")); value != "" {
-		cfg.Kafka.Producer.MarkerCreatedTopic = value
-	}
-
-	if value := strings.TrimSpace(os.Getenv("KAFKA_RUN_COMPLETED_TOPIC")); value != "" {
-		cfg.Kafka.Producer.RunCompletedTopic = value
 	}
 }

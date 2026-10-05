@@ -49,7 +49,7 @@ func (h *InputCompletedHandler) Handle(
 		return fmt.Errorf("load candles: %w", err)
 	}
 
-	markers, err := h.runner.Run(ctx, candles)
+	markers, metrics, err := h.runner.Run(ctx, candles)
 	if err != nil {
 		return fmt.Errorf("run backtest: %w", err)
 	}
@@ -65,6 +65,7 @@ func (h *InputCompletedHandler) Handle(
 		h.runner.strategy.Info().Version,
 		len(markers),
 		startedAt,
+		metrics,
 	); err != nil {
 		return err
 	}
