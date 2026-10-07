@@ -93,12 +93,13 @@ func newWriter(
 	topic string,
 ) *kafkago.Writer {
 	return &kafkago.Writer{
-		Addr:                   kafkago.TCP(broker),
-		Topic:                  topic,
-		Balancer:               &kafkago.LeastBytes{},
-		RequiredAcks:           kafkago.RequireAll,
-		Async:                  false,
-		AllowAutoTopicCreation: false,
+		Addr:         kafkago.TCP(broker),
+		Topic:        topic,
+		Balancer:     &kafkago.LeastBytes{},
+		RequiredAcks: kafkago.RequireAll,
+		Async:        false,
+		BatchSize:    1,
+		BatchTimeout: 0,
 	}
 }
 
