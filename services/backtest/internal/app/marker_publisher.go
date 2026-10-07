@@ -73,8 +73,7 @@ func (p *MarkerPublisher) PublishMarkers(
 func (p *MarkerPublisher) PublishRunCompleted(
 	ctx context.Context,
 	input events.Envelope[events.BacktestInputCompleted],
-	strategyName string,
-	strategyVersion string,
+	strategyInfo *backtest.StrategyInfo,
 	markerCount int,
 	startedAt time.Time,
 	metrics *backtest.Metrics,
@@ -88,14 +87,13 @@ func (p *MarkerPublisher) PublishRunCompleted(
 		RunID:      input.RunID,
 		OccurredAt: completedAt,
 		Payload: events.BacktestRunCompleted{
-			CandleCount:     input.Payload.CandleCount,
-			MarkerCount:     markerCount,
-			StrategyName:    strategyName,
-			StrategyVersion: strategyVersion,
-			Symbol:          input.Payload.Symbol,
-			Timeframe:       input.Payload.Timeframe,
-			StartedAt:       startedAt,
-			Metrics:         *metrics,
+			CandleCount:  input.Payload.CandleCount,
+			MarkerCount:  markerCount,
+			StrategyInfo: *strategyInfo,
+			Symbol:       input.Payload.Symbol,
+			Timeframe:    input.Payload.Timeframe,
+			StartedAt:    startedAt,
+			Metrics:      *metrics,
 		},
 	}
 

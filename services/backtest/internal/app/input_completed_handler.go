@@ -61,8 +61,7 @@ func (h *InputCompletedHandler) Handle(
 	if err := h.markerPublisher.PublishRunCompleted(
 		ctx,
 		input,
-		h.runner.strategy.Info().Name,
-		h.runner.strategy.Info().Version,
+		h.runner.strategy.Info(),
 		len(markers),
 		startedAt,
 		metrics,

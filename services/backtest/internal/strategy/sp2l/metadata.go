@@ -1,7 +1,6 @@
 package sp2l
 
 import (
-	"github.com/inpour/event-driven-trader/services/backtest/internal/strategy"
 	"github.com/inpour/event-driven-trader/shared/backtest"
 )
 
@@ -15,8 +14,8 @@ const (
 	strategyVersion = "v3"
 )
 
-func (s *Strategy) Info() *strategy.Info {
-	return &strategy.Info{
+func (s *Strategy) Info() *backtest.StrategyInfo {
+	return &backtest.StrategyInfo{
 		Name:    strategyName,
 		Version: strategyVersion,
 		Config:  s.cfg,

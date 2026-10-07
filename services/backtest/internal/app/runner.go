@@ -4,16 +4,15 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/inpour/event-driven-trader/services/backtest/internal/strategy"
 	"github.com/inpour/event-driven-trader/shared/backtest"
 	"github.com/inpour/event-driven-trader/shared/market"
 )
 
 type Runner struct {
-	strategy strategy.Strategy
+	strategy backtest.Strategy
 }
 
-func NewRunner(strategy strategy.Strategy) *Runner {
+func NewRunner(strategy backtest.Strategy) *Runner {
 	return &Runner{
 		strategy: strategy,
 	}
