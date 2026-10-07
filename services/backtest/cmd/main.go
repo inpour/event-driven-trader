@@ -9,7 +9,6 @@ import (
 	"os/signal"
 	"strings"
 	"syscall"
-	"time"
 
 	"github.com/inpour/event-driven-trader/services/backtest/internal/app"
 	"github.com/inpour/event-driven-trader/services/backtest/internal/config"
@@ -187,21 +186,6 @@ func consumeInputCompletedEvents(
 			"partition", message.Partition,
 			"offset", message.Offset,
 		)
-	}
-}
-
-func waitForRetry(
-	ctx context.Context,
-	delay time.Duration,
-) error {
-	timer := time.NewTimer(delay)
-	defer timer.Stop()
-
-	select {
-	case <-ctx.Done():
-		return ctx.Err()
-	case <-timer.C:
-		return nil
 	}
 }
 
