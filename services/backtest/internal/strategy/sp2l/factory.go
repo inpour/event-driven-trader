@@ -27,6 +27,7 @@ func DefaultConfig() *Config {
 		RR:                  1,
 		MinGapDistance:      0.03,
 		MaxEntranceDistance: 0.3,
+		SlExtraSpace:        0.003,
 		Session: market.Session{
 			StartH:  0,
 			StartM:  0,
