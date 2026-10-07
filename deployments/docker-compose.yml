@@ -87,7 +87,7 @@ services:
     build:
       context: ..
       dockerfile: services/market-data/Dockerfile
-    container_name: event-driven-trader-market-data
+    container_name: event-driven-trader-market-data-service
     environment:
       CONFIG_PATH: /app/configs/config.yaml
     volumes:
@@ -105,7 +105,7 @@ services:
     build:
       context: ..
       dockerfile: services/order-execution/Dockerfile
-    container_name: event-driven-trader-order-execution
+    container_name: event-driven-trader-order-execution-service
     environment:
       CONFIG_PATH: /app/configs/config.yaml
     volumes:
