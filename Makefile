@@ -11,6 +11,7 @@ TOPIC_RUN_COMPLETED := backtest.run.completed
 MARKET_DATA_SERVICE := market-data-service
 ORDER_EXECUTION_SERVICE := order-execution-service
 BACKTEST_SERVICE := backtest-service
+CHART_SERVICE := chart-service
 
 BACKTEST_GROUP_ID := backtest-service
 
@@ -117,6 +118,15 @@ logs-backtest:
 
 run-backtest:
 	$(COMPOSE) up -d $(BACKTEST_SERVICE)
+
+build-chart:
+	$(COMPOSE) build $(CHART_SERVICE)
+
+logs-chart:
+	$(COMPOSE) logs -f $(CHART_SERVICE)
+
+run-chart:
+	$(COMPOSE) up -d $(CHART_SERVICE)
 
 kafka-topics:
 	$(COMPOSE) exec $(KAFKA_SERVICE) \

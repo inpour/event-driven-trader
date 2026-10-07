@@ -131,3 +131,19 @@ services:
       topic-init:
         condition: service_completed_successfully
     restart: unless-stopped
+
+  chart-service:
+    build:
+      context: ..
+      dockerfile: services/chart/Dockerfile
+    container_name: event-driven-trader-chart-service
+    environment:
+      CONFIG_PATH: /app/configs/config.yaml
+    volumes:
+      - ../services/chart/configs/config.yaml:/app/configs/config.yaml:ro
+      - ../data/result:/app/data/result
+    depends_on:
+      kafka:
+        condition: service_healthy
+      topic-init:
+        condition: service_completed_successfully
