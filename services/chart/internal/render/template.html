@@ -1,0 +1,109 @@
+<!doctype html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>{{ .Title }}</title>
+    <script src="https://unpkg.com/lightweight-charts/dist/lightweight-charts.standalone.production.js"></script>
+</head>
+<body style="margin:0;background:#131722">
+<div id="chart" style="height:100vh"></div>
+<script>
+
+    const data = {{ .Data }};
+    const markers = {{ .Markers }};
+
+    const chart = LightweightCharts.createChart(
+        document.getElementById("chart"),
+        {
+            width: window.innerWidth,
+            height: window.innerHeight,
+            layout: {
+                background: { color: "#131722" },
+                textColor: "#d1d4dc"
+            },
+            grid: {
+                vertLines: { color: "#1f2937" },
+                horzLines: { color: "#1f2937" }
+            },
+            timeScale: {
+                timeVisible: true,
+                secondsVisible: false
+            },
+            crosshair: {
+                mode: LightweightCharts.CrosshairMode.Normal,
+                vertLine: {
+                    visible: true,
+                    labelVisible: true,
+                    color: "rgba(150, 150, 150, 0.45)",
+                    width: 1,
+                    style: LightweightCharts.LineStyle.Dashed
+                },
+                horzLine: {
+                    visible: true,
+                    labelVisible: true,
+                    color: "rgba(150, 150, 150, 0.65)",
+                    width: 1,
+                    style: LightweightCharts.LineStyle.Dashed,
+                    labelBackgroundColor: "#2962ff"
+                }
+            }
+        }
+    );
+
+    const volume = chart.addSeries(LightweightCharts.HistogramSeries, {
+        priceFormat: { type: "volume" },
+        priceScaleId: ""
+    });
+
+    volume.priceScale().applyOptions({
+        scaleMargins: { top: 0.80, bottom: 0 }
+    });
+
+    const candles = chart.addSeries(LightweightCharts.CandlestickSeries, {
+        upColor: "#26a69a",
+        downColor: "#ef5350",
+        borderVisible: false,
+        wickUpColor: "#26a69a",
+        wickDownColor: "#ef5350"
+    });
+
+    candles.setData(data.map(x => ({
+        time: x.time,
+        open: x.open,
+        high: x.high,
+        low: x.low,
+        close: x.close
+    })));
+
+    volume.setData(data.map(x => ({
+        time: x.time,
+        value: x.volume,
+        color: x.close >= x.open
+            ? "rgba(38, 166, 154, 0.55)"
+            : "rgba(239, 83, 80, 0.55)"
+    })));
+
+    const SeriesMarkers = markers.map(marker => ({
+        time: marker.time,
+        price: marker.price,
+        position: marker.position,
+        shape: marker.shape,
+        color: marker.color,
+        size: marker.size,
+        text: `${marker.text}`,
+    }));
+
+    LightweightCharts.createSeriesMarkers(candles, SeriesMarkers);
+
+    chart.timeScale().fitContent();
+
+    window.addEventListener("resize", () => {
+        chart.applyOptions({
+            width: window.innerWidth,
+            height: window.innerHeight
+        });
+    });
+
+</script>
+</body>
+</html>

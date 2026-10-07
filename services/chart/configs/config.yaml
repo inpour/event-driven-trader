@@ -1,0 +1,8 @@
+kafka:
+  broker: kafka:9092
+
+  consumer:
+    group_id: chart-service
+
+result:
+  output_path: /app/data/result/chart.html
