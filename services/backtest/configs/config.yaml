@@ -7,9 +7,3 @@ kafka:
 
   consumer:
     group_id: backtest-service
-    input_completed_topic: backtest.input.completed
-    candle_topic: market.candle.closed
-
-  producer:
-    marker_created_topic: backtest.marker.created
-    run_completed_topic: backtest.run.completed
