@@ -12,6 +12,8 @@ MARKET_DATA_SERVICE := market-data-service
 ORDER_EXECUTION_SERVICE := order-execution-service
 BACKTEST_SERVICE := backtest-service
 CHART_SERVICE := chart-service
+PROMETHEUS := prometheus
+KAFKA_EXPORTER := kafka-exporter
 
 BACKTEST_GROUP_ID := backtest-service
 
@@ -309,3 +311,9 @@ kafka-backtest-group:
 		--bootstrap-server $(KAFKA_BOOTSTRAP_SERVER) \
 		--describe \
 		--group $(BACKTEST_GROUP_ID)
+
+logs-prometheus:
+	$(COMPOSE) logs -f $(PROMETHEUS)
+
+logs-kafka-exporter:
+	$(COMPOSE) logs -f $(KAFKA_EXPORTER)
