@@ -1,0 +1,25 @@
+groups:
+  - name: event_driven_trader_kafka_rules
+    rules:
+      # 1. Total messages currently in each project topic
+      - record: trader:topic_messages:total
+        expr: kafka_topic_partition_current_offset{topic=~"market\\..*|backtest\\..*"}
+
+      # 2. Message production rate per second (over 1m window)
+      - record: trader:topic_messages:rate1m
+        expr: rate(kafka_topic_partition_current_offset{topic=~"market\\..*|backtest\\..*"}[1m])
+
+      # 3. Consumer group lag for your 3 consumer services
+      # (Number of uncommitted messages waiting to be processed by consumer groups)
+      - record: trader:consumer_group:lag
+        expr: kafka_consumergroup_lag{consumergroup=~"backtest-service|chart-service|order-execution-service"}
+
+  - name: event_driven_trader_alerts
+    rules:
+      - alert: ConsumerGroupLagHigh
+        expr: kafka_consumergroup_lag{consumergroup=~"backtest-service|chart-service|order-execution-service"} > 0
+        for: 30s
+        labels:
+          severity: warning
+        annotations:
+          summary: "Consumer group {{ $labels.consumergroup }} has unprocessed messages"
