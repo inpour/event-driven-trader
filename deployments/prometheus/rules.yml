@@ -14,6 +14,34 @@ groups:
       - record: trader:consumer_group:lag
         expr: kafka_consumergroup_lag{consumergroup=~"backtest-service|chart-service|order-execution-service"}
 
+  - name: event_driven_trader_order_execution_rules
+    rules:
+      # 1. Is the Go for loop actively waiting for Kafka events?
+      - record: trader:order_execution:listening
+        expr: trader_order_execution_consumer_listening
+
+      # 2. How many candles has it received
+      - record: trader:order_execution:candles
+        expr: trader_order_execution_candles_received_total
+
+      # ----------- Out of the box -----------
+
+      # 3. Memory used by the container process (Resident Set Size in MB)
+      - record: trader:order_execution:memory
+        expr: process_resident_memory_bytes{job="order-execution-service"} / 1024 / 1024
+
+      # 4. Go Heap memory currently allocated (in MB)
+      - record: trader:order_execution:heap_memory
+        expr: go_memstats_alloc_bytes{job="order-execution-service"} / 1024 / 1024
+
+      # 5. CPU Usage Rate (cores used over last 1m)
+      - record: trader:order_execution:cpu
+        expr: rate(process_cpu_seconds_total{job="order-execution-service"}[1m])
+
+      # 6. Active Goroutines inside service
+      - record: trader:order_execution:goroutines
+        expr: go_goroutines{job="order-execution-service"}
+
   - name: event_driven_trader_alerts
     rules:
       - alert: ConsumerGroupLagHigh
