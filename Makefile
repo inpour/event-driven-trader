@@ -1,5 +1,5 @@
 COMPOSE := docker compose -f deployments/docker-compose.yml
-KAFKA_SERVICE := kafka
+KAFKA := kafka
 KAFKA_BOOTSTRAP_SERVER := kafka:9092
 KAFKA_BIN := /opt/kafka/bin
 
@@ -129,13 +129,13 @@ run-chart:
 	$(COMPOSE) up -d $(CHART_SERVICE)
 
 kafka-topics:
-	$(COMPOSE) exec $(KAFKA_SERVICE) \
+	$(COMPOSE) exec $(KAFKA) \
 		$(KAFKA_BIN)/kafka-topics.sh \
 		--bootstrap-server $(KAFKA_BOOTSTRAP_SERVER) \
 		--list
 
 kafka-create-topics:
-	$(COMPOSE) exec -T $(KAFKA_SERVICE) \
+	$(COMPOSE) exec -T $(KAFKA) \
 		$(KAFKA_BIN)/kafka-topics.sh \
 		--bootstrap-server $(KAFKA_BOOTSTRAP_SERVER) \
 		--create \
@@ -144,7 +144,7 @@ kafka-create-topics:
 		--partitions 1 \
 		--replication-factor 1
 
-	$(COMPOSE) exec -T $(KAFKA_SERVICE) \
+	$(COMPOSE) exec -T $(KAFKA) \
 		$(KAFKA_BIN)/kafka-topics.sh \
 		--bootstrap-server $(KAFKA_BOOTSTRAP_SERVER) \
 		--create \
@@ -153,7 +153,7 @@ kafka-create-topics:
 		--partitions 1 \
 		--replication-factor 1
 
-	$(COMPOSE) exec -T $(KAFKA_SERVICE) \
+	$(COMPOSE) exec -T $(KAFKA) \
 		$(KAFKA_BIN)/kafka-topics.sh \
 		--bootstrap-server $(KAFKA_BOOTSTRAP_SERVER) \
 		--create \
@@ -162,7 +162,7 @@ kafka-create-topics:
 		--partitions 1 \
 		--replication-factor 1
 
-	$(COMPOSE) exec -T $(KAFKA_SERVICE) \
+	$(COMPOSE) exec -T $(KAFKA) \
 		$(KAFKA_BIN)/kafka-topics.sh \
 		--bootstrap-server $(KAFKA_BOOTSTRAP_SERVER) \
 		--create \
@@ -172,28 +172,28 @@ kafka-create-topics:
 		--replication-factor 1
 
 kafka-delete-topics:
-	$(COMPOSE) exec -T $(KAFKA_SERVICE) \
+	$(COMPOSE) exec -T $(KAFKA) \
 		$(KAFKA_BIN)/kafka-topics.sh \
 		--bootstrap-server $(KAFKA_BOOTSTRAP_SERVER) \
 		--delete \
 		--if-exists \
 		--topic $(TOPIC_CANDLE_CLOSED)
 
-	$(COMPOSE) exec -T $(KAFKA_SERVICE) \
+	$(COMPOSE) exec -T $(KAFKA) \
 		$(KAFKA_BIN)/kafka-topics.sh \
 		--bootstrap-server $(KAFKA_BOOTSTRAP_SERVER) \
 		--delete \
 		--if-exists \
 		--topic $(TOPIC_INPUT_COMPLETED)
 
-	$(COMPOSE) exec -T $(KAFKA_SERVICE) \
+	$(COMPOSE) exec -T $(KAFKA) \
 		$(KAFKA_BIN)/kafka-topics.sh \
 		--bootstrap-server $(KAFKA_BOOTSTRAP_SERVER) \
 		--delete \
 		--if-exists \
 		--topic $(TOPIC_MARKER_CREATED)
 
-	$(COMPOSE) exec -T $(KAFKA_SERVICE) \
+	$(COMPOSE) exec -T $(KAFKA) \
 		$(KAFKA_BIN)/kafka-topics.sh \
 		--bootstrap-server $(KAFKA_BOOTSTRAP_SERVER) \
 		--delete \
@@ -204,7 +204,7 @@ kafka-empty-topics:
 	$(MAKE) kafka-delete-topics
 	@echo "Waiting for Kafka to delete project topics..."
 	# because Kafka topic deletion is often asynchronous
-	@until ! $(COMPOSE) exec -T $(KAFKA_SERVICE) \
+	@until ! $(COMPOSE) exec -T $(KAFKA) \
 		$(KAFKA_BIN)/kafka-topics.sh \
 		--bootstrap-server $(KAFKA_BOOTSTRAP_SERVER) \
 		--list | grep -Ex \
@@ -218,35 +218,35 @@ kafka-empty-topics:
 	$(MAKE) kafka-topics
 
 kafka-describe-candle-closed-topic:
-	$(COMPOSE) exec $(KAFKA_SERVICE) \
+	$(COMPOSE) exec $(KAFKA) \
 		$(KAFKA_BIN)/kafka-topics.sh \
 		--bootstrap-server $(KAFKA_BOOTSTRAP_SERVER) \
 		--describe \
 		--topic $(TOPIC_CANDLE_CLOSED)
 
 kafka-describe-input-completed-topic:
-	$(COMPOSE) exec $(KAFKA_SERVICE) \
+	$(COMPOSE) exec $(KAFKA) \
 		$(KAFKA_BIN)/kafka-topics.sh \
 		--bootstrap-server $(KAFKA_BOOTSTRAP_SERVER) \
 		--describe \
 		--topic $(TOPIC_INPUT_COMPLETED)
 
 kafka-describe-marker-created-topic:
-	$(COMPOSE) exec $(KAFKA_SERVICE) \
+	$(COMPOSE) exec $(KAFKA) \
 		$(KAFKA_BIN)/kafka-topics.sh \
 		--bootstrap-server $(KAFKA_BOOTSTRAP_SERVER) \
 		--describe \
 		--topic $(TOPIC_MARKER_CREATED)
 
 kafka-describe-run-completed-topic:
-	$(COMPOSE) exec $(KAFKA_SERVICE) \
+	$(COMPOSE) exec $(KAFKA) \
 		$(KAFKA_BIN)/kafka-topics.sh \
 		--bootstrap-server $(KAFKA_BOOTSTRAP_SERVER) \
 		--describe \
 		--topic $(TOPIC_RUN_COMPLETED)
 
 kafka-candle-closed-events:
-	$(COMPOSE) exec -T $(KAFKA_SERVICE) \
+	$(COMPOSE) exec -T $(KAFKA) \
 		$(KAFKA_BIN)/kafka-console-consumer.sh \
 		--bootstrap-server $(KAFKA_BOOTSTRAP_SERVER) \
 		--topic $(TOPIC_CANDLE_CLOSED) \
@@ -259,7 +259,7 @@ kafka-candle-closed-events:
 		--property print.timestamp=true
 
 kafka-input-completed-events:
-	$(COMPOSE) exec -T $(KAFKA_SERVICE) \
+	$(COMPOSE) exec -T $(KAFKA) \
 		$(KAFKA_BIN)/kafka-console-consumer.sh \
 		--bootstrap-server $(KAFKA_BOOTSTRAP_SERVER) \
 		--topic $(TOPIC_INPUT_COMPLETED) \
@@ -272,7 +272,7 @@ kafka-input-completed-events:
 		--property print.timestamp=true
 
 kafka-marker-created-events:
-	$(COMPOSE) exec -T $(KAFKA_SERVICE) \
+	$(COMPOSE) exec -T $(KAFKA) \
 		$(KAFKA_BIN)/kafka-console-consumer.sh \
 		--bootstrap-server $(KAFKA_BOOTSTRAP_SERVER) \
 		--topic $(TOPIC_MARKER_CREATED) \
@@ -285,7 +285,7 @@ kafka-marker-created-events:
 		--property print.timestamp=true
 
 kafka-run-completed-events:
-	$(COMPOSE) exec -T $(KAFKA_SERVICE) \
+	$(COMPOSE) exec -T $(KAFKA) \
 		$(KAFKA_BIN)/kafka-console-consumer.sh \
 		--bootstrap-server $(KAFKA_BOOTSTRAP_SERVER) \
 		--topic $(TOPIC_RUN_COMPLETED) \
@@ -298,13 +298,13 @@ kafka-run-completed-events:
 		--property print.timestamp=true
 
 kafka-consumer-groups:
-	$(COMPOSE) exec -T $(KAFKA_SERVICE) \
+	$(COMPOSE) exec -T $(KAFKA) \
 		$(KAFKA_BIN)/kafka-consumer-groups.sh \
 		--bootstrap-server $(KAFKA_BOOTSTRAP_SERVER) \
 		--list
 
 kafka-backtest-group:
-	$(COMPOSE) exec -T $(KAFKA_SERVICE) \
+	$(COMPOSE) exec -T $(KAFKA) \
 		$(KAFKA_BIN)/kafka-consumer-groups.sh \
 		--bootstrap-server $(KAFKA_BOOTSTRAP_SERVER) \
 		--describe \
