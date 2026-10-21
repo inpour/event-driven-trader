@@ -4,9 +4,13 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"net/http"
 	"os"
 	"os/signal"
 	"syscall"
+	"time"
+
+	"github.com/prometheus/client_golang/prometheus/promhttp"
 
 	"github.com/inpour/event-driven-trader/services/order-execution/internal/app"
 	"github.com/inpour/event-driven-trader/services/order-execution/internal/config"
@@ -51,6 +55,25 @@ func run() error {
 		syscall.SIGTERM,
 	)
 	defer stop()
+
+	// Start Prometheus metrics HTTP server in the background
+	mux := http.NewServeMux()
+	mux.Handle("/metrics", promhttp.Handler())
+	metricsServer := &http.Server{
+		Addr:    ":" + cfg.Prometheus.MetricsServerPort,
+		Handler: mux,
+	}
+
+	go func() {
+		if err := metricsServer.ListenAndServe(); err != nil && !errors.Is(err, http.ErrServerClosed) {
+			fmt.Fprintf(os.Stderr, "metrics server error: %v\n", err)
+		}
+	}()
+	defer func() {
+		shutdownCtx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+		defer cancel()
+		_ = metricsServer.Shutdown(shutdownCtx)
+	}()
 
 	err = service.Run(ctx)
 	if errors.Is(err, context.Canceled) {

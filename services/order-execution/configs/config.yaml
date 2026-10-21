@@ -4,3 +4,6 @@ kafka:
 
 consumer:
   start_offset: latest # ignores old candle-closed events
+
+prometheus:
+  metrics_server_port: 1212

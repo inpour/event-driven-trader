@@ -9,8 +9,9 @@ import (
 )
 
 type Config struct {
-	Kafka    KafkaConfig    `yaml:"kafka"`
-	Consumer ConsumerConfig `yaml:"consumer"`
+	Kafka      KafkaConfig      `yaml:"kafka"`
+	Consumer   ConsumerConfig   `yaml:"consumer"`
+	Prometheus PrometheusConfig `yaml:"prometheus"`
 }
 
 type KafkaConfig struct {
@@ -20,6 +21,10 @@ type KafkaConfig struct {
 
 type ConsumerConfig struct {
 	StartOffset string `yaml:"start_offset"`
+}
+
+type PrometheusConfig struct {
+	MetricsServerPort string `yaml:"metrics_server_port"`
 }
 
 // Load reads YAML configuration from path and applies supported environment
@@ -54,6 +59,10 @@ func (c Config) Validate() error {
 		return fmt.Errorf("kafka.group_id is required")
 	}
 
+	if strings.TrimSpace(c.Prometheus.MetricsServerPort) == "" {
+		return fmt.Errorf("prometheus.metrics_server_port is required")
+	}
+
 	switch c.Consumer.StartOffset {
 	case "earliest", "latest":
 		return nil
@@ -78,5 +87,9 @@ func applyEnvironmentOverrides(cfg *Config) {
 
 	if value := os.Getenv("CONSUMER_START_OFFSET"); value != "" {
 		cfg.Consumer.StartOffset = value
+	}
+
+	if value := os.Getenv("PROMETHEUS_METRICS_SERVER_PORT"); value != "" {
+		cfg.Prometheus.MetricsServerPort = value
 	}
 }

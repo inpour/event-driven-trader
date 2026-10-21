@@ -2,7 +2,7 @@ FROM golang:1.26-alpine AS build
 
 WORKDIR /src
 
-ENV GOPROXY=direct
+ENV GOPROXY=https://goproxy.io,direct
 ENV GOSUMDB=off
 
 RUN apk add --no-cache git
