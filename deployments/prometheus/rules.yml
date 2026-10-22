@@ -42,6 +42,43 @@ groups:
       - record: trader:order_execution:goroutines
         expr: go_goroutines{job="order-execution-service"}
 
+  - name: event_driven_trader_backtest_rules
+    rules:
+      # 1. Divides total time spent (_sum) by number of runs (_count) for all labels to see main bottleneck
+      - record: trader:backtest:average
+        expr: trader_backtest_duration_seconds_sum / trader_backtest_duration_seconds_count
+
+      # 2. The time (in seconds) below which 95% of individual Kafka marker writes completed over the last 5 minutes
+      - record: trader:backtest:95th_percentile_kafka_latency
+        expr: histogram_quantile(0.95, rate(trader_backtest_marker_publish_duration_seconds_bucket[5m]))
+
+      # 3. Maximum time it took for the fastest 95% of backtest stages to complete over the last 5 minutes
+      # (It filters out the top 5% of extreme outliers)
+      - record: trader:backtest:average
+        expr: histogram_quantile(0.95, sum by (le, stage) (rate(trader_backtest_duration_seconds_bucket[5m])))
+
+      # 4. Shows the raw cumulative distribution across buckets
+      - record: trader:backtest:95th_percentile_kafka_latency
+        expr: trader_backtest_duration_seconds_bucket{stage="strategy_probe"}
+
+      # ----------- Out of the box -----------
+
+      # 5. Memory used by the container process (Resident Set Size in MB)
+      - record: trader:backtest:memory
+        expr: process_resident_memory_bytes{job="backtest-service-service"} / 1024 / 1024
+
+      # 6. Go Heap memory currently allocated (in MB)
+      - record: trader:backtest:heap_memory
+        expr: go_memstats_alloc_bytes{job="backtest-service-service"} / 1024 / 1024
+
+      # 7. CPU Usage Rate (cores used over last 1m)
+      - record: trader:backtest:cpu
+        expr: rate(process_cpu_seconds_total{job="backtest-service-service"}[1m])
+
+      # 8. Active Goroutines inside service
+      - record: trader:backtest:goroutines
+        expr: go_goroutines{job="backtest-service-service"}
+
   - name: event_driven_trader_alerts
     rules:
       - alert: ConsumerGroupLagHigh
