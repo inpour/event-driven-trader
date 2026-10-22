@@ -1,93 +1,97 @@
 groups:
   - name: event_driven_trader_kafka_rules
     rules:
-      # 1. Total messages currently in each project topic
+      # Total messages currently in each project topic
       - record: trader:topic_messages:total
         expr: kafka_topic_partition_current_offset{topic=~"market\\..*|backtest\\..*"}
 
-      # 2. Message production rate per second (over 1m window)
+      # Message production rate per second (over 1m window)
       - record: trader:topic_messages:rate1m
         expr: rate(kafka_topic_partition_current_offset{topic=~"market\\..*|backtest\\..*"}[1m])
 
-      # 3. Consumer group lag for consumer services
+      # Consumer group lag for consumer services
       # (Number of uncommitted messages waiting to be processed by consumer groups)
       - record: trader:consumer_group:lag
         expr: kafka_consumergroup_lag{consumergroup=~"backtest-service|chart-service|order-execution-service"}
 
   - name: event_driven_trader_order_execution_rules
     rules:
-      # 1. Is the Go for loop actively waiting for Kafka events?
+      # Is the Go for loop actively waiting for Kafka events?
       - record: trader:order_execution:listening
         expr: trader_order_execution_consumer_listening
 
-      # 2. How many candles has it received
+      # How many candles has it received
       - record: trader:order_execution:candles
         expr: trader_order_execution_candles_received_total
 
       # ----------- Out of the box -----------
 
-      # 3. Memory used by the container process (Resident Set Size in MB)
+      # Memory used by the container process (Resident Set Size in MB)
       - record: trader:order_execution:memory
         expr: process_resident_memory_bytes{job="order-execution-service"} / 1024 / 1024
 
-      # 4. Go Heap memory currently allocated (in MB)
+      # Go Heap memory currently allocated (in MB)
       - record: trader:order_execution:heap_memory
         expr: go_memstats_alloc_bytes{job="order-execution-service"} / 1024 / 1024
 
-      # 5. CPU Usage Rate (cores used over last 1m)
+      # CPU Usage Rate (cores used over last 1m)
       - record: trader:order_execution:cpu
         expr: rate(process_cpu_seconds_total{job="order-execution-service"}[1m])
 
-      # 6. Active Goroutines inside service
+      # Active Goroutines inside service
       - record: trader:order_execution:goroutines
         expr: go_goroutines{job="order-execution-service"}
 
   - name: event_driven_trader_backtest_rules
     rules:
-      # 1. Divides total time spent (_sum) by number of runs (_count) for all labels to see main bottleneck
+      # Divides total time spent (_sum) by number of runs (_count) for all labels to see main bottleneck
       - record: trader:backtest:average
         expr: trader_backtest_duration_seconds_sum / trader_backtest_duration_seconds_count
 
-      # 2. The time (in seconds) below which 95% of individual Kafka marker writes completed over the last 5 minutes
+      # The time (in seconds) below which 95% of individual Kafka marker writes completed over the last 5 minutes
       - record: trader:backtest:95th_percentile_kafka_latency
         expr: histogram_quantile(0.95, rate(trader_backtest_marker_publish_duration_seconds_bucket[5m]))
 
-      # 3. Maximum time it took for the fastest 95% of backtest stages to complete
+      # Shows the raw cumulative distribution across buckets
+      - record: trader:backtest:raw_marker_publish_buckets
+        expr: trader_backtest_marker_publish_duration_seconds_bucket
+
+      # Maximum time it took for the fastest 95% of backtest stages to complete
       # (It filters out the top 5% of extreme outliers)
       - record: trader:backtest:95th_percentile_time
         expr: histogram_quantile(0.95, sum by (le, stage) (trader_backtest_duration_seconds_bucket))
 
-      # 4. Shows the raw cumulative distribution across buckets
-      - record: trader:backtest:raw_total
+      # Shows the raw cumulative distribution across buckets
+      - record: trader:backtest:raw_total_buckets
         expr: trader_backtest_duration_seconds_bucket{stage="total"}
 
-      # 4. Shows the raw cumulative distribution across buckets
-      - record: trader:backtest:raw_load_candles
+      # Shows the raw cumulative distribution across buckets
+      - record: trader:backtest:raw_load_candles_buckets
         expr: trader_backtest_duration_seconds_bucket{stage="load_candles"}
 
-      # 4. Shows the raw cumulative distribution across buckets
-      - record: trader:backtest:raw_strategy_probe
+      # Shows the raw cumulative distribution across buckets
+      - record: trader:backtest:raw_strategy_probe_buckets
         expr: trader_backtest_duration_seconds_bucket{stage="strategy_probe"}
 
-      # 4. Shows the raw cumulative distribution across buckets
-      - record: trader:backtest:raw_publish_results
+      # Shows the raw cumulative distribution across buckets
+      - record: trader:backtest:raw_publish_results_buckets
         expr: trader_backtest_duration_seconds_bucket{stage="publish_results"}
 
       # ----------- Out of the box -----------
 
-      # 5. Memory used by the container process (Resident Set Size in MB)
+      # Memory used by the container process (Resident Set Size in MB)
       - record: trader:backtest:memory
         expr: process_resident_memory_bytes{job="backtest-service"} / 1024 / 1024
 
-      # 6. Go Heap memory currently allocated (in MB)
+      # Go Heap memory currently allocated (in MB)
       - record: trader:backtest:heap_memory
         expr: go_memstats_alloc_bytes{job="backtest-service"} / 1024 / 1024
 
-      # 7. CPU Usage Rate (cores used over last 1m)
+      # CPU Usage Rate (cores used over last 1m)
       - record: trader:backtest:cpu
         expr: rate(process_cpu_seconds_total{job="backtest-service"}[1m])
 
-      # 8. Active Goroutines inside service
+      # Active Goroutines inside service
       - record: trader:backtest:goroutines
         expr: go_goroutines{job="backtest-service"}
 
