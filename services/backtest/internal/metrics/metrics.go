@@ -11,7 +11,7 @@ var (
 		prometheus.HistogramOpts{
 			Name: "trader_backtest_duration_seconds",
 			Help: "Duration of backtest pipeline stages in seconds.",
-			// Buckets from 1ms (0.001s) to 100s to cover both fast CPU strategy runs and slower Kafka I/O
+			// Buckets from 1ms (0.001s) to 10s to cover both fast CPU strategy runs and slower Kafka I/O
 			Buckets: []float64{0.001, 0.005, 0.01, 0.025, 0.05, 0.1, 0.25, 0.5, 1, 2, 3, 4, 5, 7.5, 10},
 		},
 		[]string{"stage", "symbol", "timeframe"},
