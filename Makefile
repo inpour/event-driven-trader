@@ -1,4 +1,5 @@
 COMPOSE := docker compose -f deployments/docker-compose.yml
+COMPOSE_MONITORING := docker compose -f monitoring/docker-compose.monitoring.yml
 KAFKA := kafka
 KAFKA_BOOTSTRAP_SERVER := kafka:9092
 KAFKA_BIN := /opt/kafka/bin
@@ -52,7 +53,12 @@ BACKTEST_GROUP_ID := backtest-service
 	kafka-marker-created-events \
 	kafka-run-completed-events\
 	kafka-consumer-groups \
-	kafka-backtest-group
+	kafka-backtest-group \
+	up-monitoring \
+	down-monitoring \
+	logs-monitoring \
+	logs-prometheus \
+	logs-kafka-exporter
 
 rebuild:
 	$(COMPOSE) up --build --force-recreate -d
@@ -313,7 +319,16 @@ kafka-backtest-group:
 		--group $(BACKTEST_GROUP_ID)
 
 logs-prometheus:
-	$(COMPOSE) logs -f $(PROMETHEUS)
+	$(COMPOSE_MONITORING) logs -f $(PROMETHEUS)
 
 logs-kafka-exporter:
-	$(COMPOSE) logs -f $(KAFKA_EXPORTER)
+	$(COMPOSE_MONITORING) logs -f $(KAFKA_EXPORTER)
+
+up-monitoring:
+	$(COMPOSE_MONITORING) up -d
+
+down-monitoring:
+	$(COMPOSE_MONITORING) down
+
+logs-monitoring:
+	$(COMPOSE_MONITORING) logs -f

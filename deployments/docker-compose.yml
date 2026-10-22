@@ -148,28 +148,6 @@ services:
       topic-init:
         condition: service_completed_successfully
 
-  kafka-exporter:
-    image: danielqsj/kafka-exporter:v1.8.0
-    container_name: event-driven-trader-kafka-exporter
-    command:
-      - "--kafka.server=kafka:9092"
-    depends_on:
-      kafka:
-        condition: service_healthy
-      topic-init:
-        condition: service_completed_successfully
-    restart: unless-stopped
-
-  prometheus:
-    image: prom/prometheus:v3.2.1
-    container_name: event-driven-trader-prometheus
-    ports:
-      - "127.0.0.1:9090:9090"
-    volumes:
-      - ./prometheus:/etc/prometheus:ro
-    command:
-      - "--config.file=/etc/prometheus/prometheus.yml"
-      - "--storage.tsdb.path=/prometheus"
-    depends_on:
-      - kafka-exporter
-    restart: unless-stopped
+networks:
+  default:
+    name: event-driven-trader-network
