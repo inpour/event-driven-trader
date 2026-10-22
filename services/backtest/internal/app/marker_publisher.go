@@ -5,8 +5,10 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/inpour/event-driven-trader/services/backtest/internal/metrics"
 	"github.com/inpour/event-driven-trader/shared/backtest"
 	"github.com/inpour/event-driven-trader/shared/events"
+	"github.com/prometheus/client_golang/prometheus"
 )
 
 type BacktestOutputPublisher interface {
@@ -58,7 +60,12 @@ func (p *MarkerPublisher) PublishMarkers(
 			},
 		}
 
-		if err := p.publisher.PublishMarkerCreated(ctx, event); err != nil {
+		// Start timing this single Kafka write
+		timer := prometheus.NewTimer(metrics.MarkerPublishDurationSeconds)
+		err := p.publisher.PublishMarkerCreated(ctx, event)
+		timer.ObserveDuration() // Record duration into the histogram bucket
+
+		if err != nil {
 			return fmt.Errorf(
 				"publish marker %d: %w",
 				index,

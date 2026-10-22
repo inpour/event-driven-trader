@@ -7,3 +7,6 @@ kafka:
 
   consumer:
     group_id: backtest-service
+
+prometheus:
+  metrics_server_port: 1212

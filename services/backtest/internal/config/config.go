@@ -10,8 +10,9 @@ import (
 )
 
 type Config struct {
-	Service ServiceConfig `yaml:"service"`
-	Kafka   KafkaConfig   `yaml:"kafka"`
+	Service    ServiceConfig    `yaml:"service"`
+	Kafka      KafkaConfig      `yaml:"kafka"`
+	Prometheus PrometheusConfig `yaml:"prometheus"`
 }
 
 type ServiceConfig struct {
@@ -26,6 +27,10 @@ type KafkaConfig struct {
 
 type KafkaConsumerConfig struct {
 	GroupID string `yaml:"group_id"`
+}
+
+type PrometheusConfig struct {
+	MetricsServerPort string `yaml:"metrics_server_port"`
 }
 
 // Load reads YAML configuration from path and applies supported environment
@@ -82,6 +87,13 @@ func (c Config) Validate() error {
 		)
 	}
 
+	if strings.TrimSpace(c.Prometheus.MetricsServerPort) == "" {
+		result = errors.Join(
+			result,
+			errors.New("prometheus.metrics_server_port is required"),
+		)
+	}
+
 	return result
 }
 
@@ -100,5 +112,9 @@ func applyEnvironmentOverrides(cfg *Config) {
 
 	if value := strings.TrimSpace(os.Getenv("KAFKA_GROUP_ID")); value != "" {
 		cfg.Kafka.Consumer.GroupID = value
+	}
+
+	if value := strings.TrimSpace(os.Getenv("PROMETHEUS_METRICS_SERVER_PORT")); value != "" {
+		cfg.Prometheus.MetricsServerPort = value
 	}
 }

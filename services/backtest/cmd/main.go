@@ -5,16 +5,19 @@ import (
 	"errors"
 	"fmt"
 	"log/slog"
+	"net/http"
 	"os"
 	"os/signal"
 	"strings"
 	"syscall"
+	"time"
 
 	"github.com/inpour/event-driven-trader/services/backtest/internal/app"
 	"github.com/inpour/event-driven-trader/services/backtest/internal/config"
 	"github.com/inpour/event-driven-trader/services/backtest/internal/kafka"
 	"github.com/inpour/event-driven-trader/services/backtest/internal/strategy/sp2l"
 	"github.com/inpour/event-driven-trader/shared/events"
+	"github.com/prometheus/client_golang/prometheus/promhttp"
 )
 
 const defaultConfigPath = "/app/configs/config.yaml"
@@ -92,6 +95,24 @@ func run() error {
 		markerPublisher,
 		logger,
 	)
+
+	mux := http.NewServeMux()
+	mux.Handle("/metrics", promhttp.Handler())
+	metricsServer := &http.Server{
+		Addr:    ":" + cfg.Prometheus.MetricsServerPort,
+		Handler: mux,
+	}
+
+	go func() {
+		if err := metricsServer.ListenAndServe(); err != nil && !errors.Is(err, http.ErrServerClosed) {
+			logger.Error("metrics server failed", "error", err)
+		}
+	}()
+	defer func() {
+		shutdownCtx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+		defer cancel()
+		_ = metricsServer.Shutdown(shutdownCtx)
+	}()
 
 	logger.Info(
 		"backtest service started",

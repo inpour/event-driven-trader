@@ -6,6 +6,7 @@ import (
 	"log/slog"
 	"time"
 
+	"github.com/inpour/event-driven-trader/services/backtest/internal/metrics"
 	"github.com/inpour/event-driven-trader/shared/events"
 )
 
@@ -35,25 +36,46 @@ func (h *InputCompletedHandler) Handle(
 	input events.Envelope[events.BacktestInputCompleted],
 ) error {
 	startedAt := time.Now().UTC()
+	symbol := input.Payload.Symbol
+	timeframe := input.Payload.Timeframe
+
+	// Measure total end-to-end backtest duration when Handle exits
+	defer func() {
+		metrics.BacktestDurationSeconds.
+			WithLabelValues("total", symbol, timeframe).
+			Observe(time.Since(startedAt).Seconds())
+	}()
 
 	h.logger.Info(
 		"starting backtest",
 		"run_id", input.RunID,
-		"symbol", input.Payload.Symbol,
-		"timeframe", input.Payload.Timeframe,
+		"symbol", symbol,
+		"timeframe", timeframe,
 		"expected_candle_count", input.Payload.CandleCount,
 	)
 
+	// 1. Measure Candle Loading from Kafka
+	loadStart := time.Now()
 	candles, err := h.candleLoader.Load(ctx, input)
+	metrics.BacktestDurationSeconds.
+		WithLabelValues("load_candles", symbol, timeframe).
+		Observe(time.Since(loadStart).Seconds())
 	if err != nil {
 		return fmt.Errorf("load candles: %w", err)
 	}
 
-	markers, metrics, err := h.runner.Run(ctx, candles)
+	// 2. Measure Strategy Execution (SP2L Probe)
+	runStart := time.Now()
+	markers, strategyMetrics, err := h.runner.Run(ctx, candles)
+	metrics.BacktestDurationSeconds.
+		WithLabelValues("strategy_probe", symbol, timeframe).
+		Observe(time.Since(runStart).Seconds())
 	if err != nil {
 		return fmt.Errorf("run backtest: %w", err)
 	}
 
+	// 3. Measure Publishing Markers + RunCompleted to Kafka
+	pubStart := time.Now()
 	if err := h.markerPublisher.PublishMarkers(ctx, input, markers); err != nil {
 		return fmt.Errorf("publish markers: %w", err)
 	}
@@ -64,10 +86,13 @@ func (h *InputCompletedHandler) Handle(
 		h.runner.strategy.Info(),
 		len(markers),
 		startedAt,
-		metrics,
+		strategyMetrics,
 	); err != nil {
 		return err
 	}
+	metrics.BacktestDurationSeconds.
+		WithLabelValues("publish_results", symbol, timeframe).
+		Observe(time.Since(pubStart).Seconds())
 
 	h.logger.Info(
 		"backtest completed",
