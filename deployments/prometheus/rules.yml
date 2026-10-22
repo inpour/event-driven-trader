@@ -52,14 +52,26 @@ groups:
       - record: trader:backtest:95th_percentile_kafka_latency
         expr: histogram_quantile(0.95, rate(trader_backtest_marker_publish_duration_seconds_bucket[5m]))
 
-      # 3. Maximum time it took for the fastest 95% of backtest stages to complete over the last 5 minutes
+      # 3. Maximum time it took for the fastest 95% of backtest stages to complete
       # (It filters out the top 5% of extreme outliers)
-      - record: trader:backtest:average
-        expr: histogram_quantile(0.95, sum by (le, stage) (rate(trader_backtest_duration_seconds_bucket[5m])))
+      - record: trader:backtest:95th_percentile_time
+        expr: histogram_quantile(0.95, sum by (le, stage) (trader_backtest_duration_seconds_bucket))
 
       # 4. Shows the raw cumulative distribution across buckets
-      - record: trader:backtest:95th_percentile_kafka_latency
+      - record: trader:backtest:raw_total
+        expr: trader_backtest_duration_seconds_bucket{stage="total"}
+
+      # 4. Shows the raw cumulative distribution across buckets
+      - record: trader:backtest:raw_load_candles
+        expr: trader_backtest_duration_seconds_bucket{stage="load_candles"}
+
+      # 4. Shows the raw cumulative distribution across buckets
+      - record: trader:backtest:raw_strategy_probe
         expr: trader_backtest_duration_seconds_bucket{stage="strategy_probe"}
+
+      # 4. Shows the raw cumulative distribution across buckets
+      - record: trader:backtest:raw_publish_results
+        expr: trader_backtest_duration_seconds_bucket{stage="publish_results"}
 
       # ----------- Out of the box -----------
 
