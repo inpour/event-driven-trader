@@ -77,19 +77,19 @@ groups:
 
       # 5. Memory used by the container process (Resident Set Size in MB)
       - record: trader:backtest:memory
-        expr: process_resident_memory_bytes{job="backtest-service-service"} / 1024 / 1024
+        expr: process_resident_memory_bytes{job="backtest-service"} / 1024 / 1024
 
       # 6. Go Heap memory currently allocated (in MB)
       - record: trader:backtest:heap_memory
-        expr: go_memstats_alloc_bytes{job="backtest-service-service"} / 1024 / 1024
+        expr: go_memstats_alloc_bytes{job="backtest-service"} / 1024 / 1024
 
       # 7. CPU Usage Rate (cores used over last 1m)
       - record: trader:backtest:cpu
-        expr: rate(process_cpu_seconds_total{job="backtest-service-service"}[1m])
+        expr: rate(process_cpu_seconds_total{job="backtest-service"}[1m])
 
       # 8. Active Goroutines inside service
       - record: trader:backtest:goroutines
-        expr: go_goroutines{job="backtest-service-service"}
+        expr: go_goroutines{job="backtest-service"}
 
   - name: event_driven_trader_alerts
     rules:
