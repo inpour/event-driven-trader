@@ -19,6 +19,7 @@ KAFKA_EXPORTER := kafka-exporter
 BACKTEST_GROUP_ID := backtest-service
 
 .PHONY: \
+	build \
 	rebuild \
 	rebuild-no-cache \
 	reset \
@@ -59,6 +60,9 @@ BACKTEST_GROUP_ID := backtest-service
 	logs-monitoring \
 	logs-prometheus \
 	logs-kafka-exporter
+
+build:
+	$(COMPOSE) build
 
 rebuild:
 	$(COMPOSE) up --build --force-recreate -d
