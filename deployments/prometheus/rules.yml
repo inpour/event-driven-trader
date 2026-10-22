@@ -9,7 +9,7 @@ groups:
       - record: trader:topic_messages:rate1m
         expr: rate(kafka_topic_partition_current_offset{topic=~"market\\..*|backtest\\..*"}[1m])
 
-      # 3. Consumer group lag for your 3 consumer services
+      # 3. Consumer group lag for consumer services
       # (Number of uncommitted messages waiting to be processed by consumer groups)
       - record: trader:consumer_group:lag
         expr: kafka_consumergroup_lag{consumergroup=~"backtest-service|chart-service|order-execution-service"}
